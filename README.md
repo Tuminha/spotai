@@ -2,10 +2,7 @@
 
 The Presentation Generator is an application powered by the GPT3.5 language model. It allows users to create presentation scripts by simply providing a topic. The application utilizes the LangChain framework for developing language model-powered applications.<br>
 
-
-
-https://github.com/mehdi0807/presentation-generator-gpt/assets/92737907/b584a583-c05d-4f19-b4ad-321087cf1f0a
-
+https://github.com/mehdi0807/presentation-generator-gpt/assets/92737907/cea4795e-0aed-4040-bef7-5ea83c39b1ca
 
 
 ## Motivation
