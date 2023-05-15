@@ -30,7 +30,7 @@ To run the Presentation Generator, ensure you have the following:
 
 - Python
 - LangChain
-- OpenAI GPT3.5 API key
+- OpenAI API key
 
 ## Usage
 
@@ -51,7 +51,7 @@ stramlit run app.py
 
 ## Configuration
 
-- OpenAI API Key: Replace the placeholder `'YOUR_API_KEY'` in the `app.py` file with your actual OpenAI GPT3.5 API key. 
+- OpenAI API Key: Replace the placeholder `'YOUR_API_KEY'` in the `app.py` file with your actual OpenAI API key. 
 
 <pre>
 os.environ['OPENAI_API_KEY'] = 'YOUR_API_KEY'
