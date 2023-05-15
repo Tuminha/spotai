@@ -64,4 +64,5 @@ I hope that by sharing this application, it can benefit other students and indiv
 ## Acknowledgments
 
 LangChain: https://langchain.org
+
 OpenAI: https://openai.com
