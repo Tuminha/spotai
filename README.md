@@ -1,7 +1,11 @@
 # Presentation Generator
 
 The Presentation Generator is an application powered by the GPT3.5 language model. It allows users to create presentations by simply providing a topic. The application utilizes the LangChain framework for developing language model-powered applications.<br>
-![The app](presentation-generator.mp4)
+<!-- ![The app](presentation-generator.mp4) -->
+<video width="320" height="240" controls>
+  <source src="presentation-generator.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video>
 
 ## Features
 
