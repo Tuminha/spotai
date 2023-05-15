@@ -10,7 +10,7 @@ from langchain.utilities import WikipediaAPIWrapper
 
 # App framework
 st.title('😁🔗 Presentation Generator')
-prompt = st.text_input('Plug in your subject here') 
+topic = st.text_input('Plug in your subject here') 
 
 # Prompt templates
 title_template = PromptTemplate(
@@ -37,7 +37,7 @@ script_chain = LLMChain(prompt=script_template, verbose=True, output_key='script
 wiki = WikipediaAPIWrapper()
 
 # Show results
-if prompt: 
+if topic: 
     title = title_chain.run(prompt)
     wiki_research = wiki.run(prompt) 
     script = script_chain.run(title=title, wikipedia_research=wiki_research)
