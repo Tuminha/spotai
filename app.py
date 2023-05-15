@@ -38,8 +38,8 @@ wiki = WikipediaAPIWrapper()
 
 # Show results
 if topic: 
-    title = title_chain.run(prompt)
-    wiki_research = wiki.run(prompt) 
+    title = title_chain.run(topic)
+    wiki_research = wiki.run(topic) 
     script = script_chain.run(title=title, wikipedia_research=wiki_research)
 
     st.write(title) 
