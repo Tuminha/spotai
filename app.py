@@ -47,7 +47,7 @@ llm = OpenAI(temperature=0.9)
 title_chain = LLMChain(prompt=title_template, llm=llm, memory=title_memory)
 intro_chain = LLMChain(prompt=intro_template, llm=llm, memory=intro_memory)
 topic_slide_chain = LLMChain(prompt=topic_slide_template, llm=llm, memory=topic_slide_memory)
-conclusion_chain = LLMChain# The assistant code was cut off in the previous message. Continue the code here.
+conclusion_chain = LLMChain(prompt=conclusion_template, llm=llm, memory=conclusion_memory)
 conclusion_chain = LLMChain(prompt=conclusion_template, llm=llm, memory=conclusion_memory)
 
 # Wikipedia
