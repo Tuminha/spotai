@@ -1,5 +1,4 @@
 import os 
-os.environ['OPENAI_API_KEY'] = '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'
 
 import streamlit as st 
 from langchain.llms import OpenAI
@@ -7,6 +6,7 @@ from langchain import PromptTemplate
 from langchain.chains import LLMChain
 from langchain.memory import ConversationBufferMemory
 from langchain.utilities import WikipediaAPIWrapper 
+from dotenv import load_dotenv
 
 # App framework
 st.title('🦷 Perio & Implant dentistry Presentation Creator')
