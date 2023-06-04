@@ -1,5 +1,5 @@
 import os 
-os.environ['OPENAI_API_KEY'] = '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'
+os.environ['OPENAI_API_KEY'] = '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'
 
 import streamlit as st 
 from langchain.llms import OpenAI
@@ -14,6 +14,14 @@ main_topic = st.text_input('Enter the main topic')
 subtopic = st.text_input('Enter the subtopic')
 duration = st.text_input('Enter the duration of the presentation')
 audience = st.text_input('Enter the audience for the presentation')
+
+# Temperature options
+temperature_options = {
+    'Daniel Rodrigo Mode': 0.2,
+    'Leticia Sala Mode': 0.5,
+    'Robles Mode': 0.9
+}
+selected_temperature = st.selectbox('Select the temperature mode', list(temperature_options.keys()))
 
 # Prompt templates
 title_template = PromptTemplate(
@@ -43,11 +51,11 @@ topic_slide_memory = ConversationBufferMemory(input_key='main_topic', memory_key
 conclusion_memory = ConversationBufferMemory(input_key='main_topic', memory_key='chat_history')
 
 # GPT model
-llm = OpenAI(temperature=0.9)
+temperature = temperature_options[selected_temperature]
+llm = OpenAI(temperature=temperature)
 title_chain = LLMChain(prompt=title_template, llm=llm, memory=title_memory)
 intro_chain = LLMChain(prompt=intro_template, llm=llm, memory=intro_memory)
 topic_slide_chain = LLMChain(prompt=topic_slide_template, llm=llm, memory=topic_slide_memory)
-conclusion_chain = LLMChain(prompt=conclusion_template, llm=llm, memory=conclusion_memory)
 conclusion_chain = LLMChain(prompt=conclusion_template, llm=llm, memory=conclusion_memory)
 
 # Wikipedia
