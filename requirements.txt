@@ -55,7 +55,7 @@ multidict==6.0.4
 mypy-extensions==1.0.0
 numexpr==2.8.4
 numpy==1.24.3
-onnxruntime==1.14.1
+onnxruntime
 openai==0.27.7
 openapi-schema-pydantic==1.2.4
 overrides==7.3.1
