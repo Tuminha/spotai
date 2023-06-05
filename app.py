@@ -8,6 +8,11 @@ from langchain.memory import ConversationBufferMemory
 from langchain.utilities import WikipediaAPIWrapper 
 from dotenv import load_dotenv
 
+# Get the OpenAI API key from Heroku config vars
+openai_api_key = os.environ.get('OPENAI_API_KEY')
+
+
+
 # App framework
 st.title('🦷 Perio & Implant dentistry Presentation Creator')
 main_topic = st.text_input('Enter the main topic')
@@ -22,7 +27,10 @@ temperature_options = {
     'Robles Mode': 0.9
 }
 selected_temperature = st.selectbox('Select the temperature mode', list(temperature_options.keys()))
+temperature = temperature_options[selected_temperature]
 
+# Initialize the OpenAI API with the API key from Heroku config vars
+llm = OpenAI(api_key=openai_api_key, temperature=temperature)
 # Prompt templates
 title_template = PromptTemplate(
     input_variables=['main_topic', 'subtopic', 'duration', 'audience'], 
