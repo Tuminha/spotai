@@ -1,7 +1,5 @@
 import os
-from streamlit import progress as st_progress
-from click import progressbar 
-import streamlit as st 
+import streamlit as st
 from langchain.llms import OpenAI
 from langchain import PromptTemplate, Wikipedia
 from langchain.chains import LLMChain
@@ -88,7 +86,7 @@ if submit_button:
         topic_slide_memory = ConversationBufferMemory(input_key='main_topic', memory_key='chat_history')
         conclusion_memory = ConversationBufferMemory(input_key='main_topic', memory_key='chat_history')
 
-       # Chains
+        # Chains
         title_chain = LLMChain(llm=llm, prompt=title_template, memory=title_memory)
         intro_chain = LLMChain(llm=llm, prompt=intro_template, memory=intro_memory)
         overview_chain = LLMChain(llm=llm, prompt=overview_template, memory=overview_memory)
@@ -98,27 +96,23 @@ if submit_button:
 
         wiki = WikipediaAPIWrapper()
 
-
-       # Generate slide 1
+        # Generate slide 1
         slide_title = f"Advantages of {main_topic} and {subtopic}"
         bullet_points = "• Bullet point 1\n• Bullet point 2\n• Bullet point 3"  # Replace with relevant content based on the query
         topic_slide1 = topic_slide_chain1.run(main_topic=main_topic, subtopic=subtopic, wikipedia_research=main_topic + "\n\n" + subtopic, slide_title=slide_title, bullet_points=bullet_points)
-        st_progress(0.7)
-
+        progress_bar = st.progress(0.7)
 
         # Generate slide 2
         slide_title = f"Procedures of {main_topic} and {subtopic}"
         bullet_points = "• Bullet point 1\n• Bullet point 2\n• Bullet point 3"  # Replace with relevant content based on the query
         topic_slide2 = topic_slide_chain2.run(main_topic=main_topic, subtopic=subtopic, wikipedia_research=main_topic + "\n\n" + subtopic, slide_title=slide_title, bullet_points=bullet_points)
-        progressbar.progress(0.8)
-        # Progress bar
-        progress_bar = st.progress(0)
+        st.progress(0.8)
 
         # Fetch Wikipedia research for each of the topics and update the progress bar
         main_topic_research = get_wiki_research(main_topic, 0.1)
         subtopic_research = get_wiki_research(subtopic, 0.2)
 
-       # Run the chains and update the progress bar
+        # Run the chains and update the progress bar
         progress_bar.progress(0.3)
         title = title_chain.run(main_topic=main_topic, subtopic=subtopic, duration=duration, audience=audience)
         progress_bar.progress(0.4)
@@ -127,14 +121,11 @@ if submit_button:
         overview = overview_chain.run(main_topic=main_topic, subtopic=subtopic)
         progress_bar.progress(0.6)
         topic_slide1 = topic_slide_chain1.run(main_topic=main_topic, subtopic=subtopic, wikipedia_research=main_topic_research + "\n\n" + subtopic_research)
-        st.progress(0.7)
+        progress_bar.progress(0.7)
         topic_slide2 = topic_slide_chain2.run(main_topic=main_topic, subtopic=subtopic, wikipedia_research=main_topic_research + "\n\n" + subtopic_research)
-        st.progress(0.8)
+        progress_bar.progress(0.8)
         conclusion = conclusion_chain.run(main_topic=main_topic, subtopic=subtopic)
         progress_bar.progress(1.0)
-
-
-      
 
         # Show the results
         st.success('Presentation generated successfully!')
