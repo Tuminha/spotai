@@ -1,4 +1,5 @@
 import os
+from click import progressbar
 import streamlit as st
 from langchain.llms import OpenAI
 from langchain import PromptTemplate, Wikipedia
@@ -13,7 +14,7 @@ openai_api_key = os.environ.get('OPENAI_API_KEY')
 # Function to update the progress bar and fetch Wikipedia research
 def get_wiki_research(topic, progress):
     wiki_research = wiki.run(topic)
-    progress_bar.progress(progress)
+    progressbar.progress(progress)
     return wiki_research
 
 # Function to format slide content into bullet points
