@@ -13,18 +13,21 @@ openai_api_key = os.environ.get('OPENAI_API_KEY')
 
 # App framework
 st.title('🦷 Perio & Implant dentistry Presentation Creator')
-main_topic = st.text_input('Enter the main topic')
-subtopic = st.text_input('Enter the subtopic')
-duration = st.text_input('Enter the duration of the presentation')
-audience = st.text_input('Enter the audience for the presentation')
-submit_button = st.form_submit_button(label='Submit')
+with st.form(key='my_form'):
+    main_topic = st.text_input('Enter the main topic')
+    subtopic = st.text_input('Enter the subtopic')
+    duration = st.text_input('Enter the duration of the presentation')
+    audience = st.text_input('Enter the audience for the presentation')
+    submit_button = st.form_submit_button(label='Submit')
 
-# Temperature options
-temperature_options = {
-    'Daniel Rodrigo Mode': 0.2,
-    'Leticia Sala Mode': 0.5,
-    'Robles Mode': 0.9
-}
+
+if submit_button:
+    # Temperature options
+    temperature_options = {
+        'Daniel Rodrigo Mode': 0.2,
+        'Leticia Sala Mode': 0.5,
+        'Robles Mode': 0.9
+    }
 selected_temperature = st.selectbox('Select the temperature mode', list(temperature_options.keys()))
 temperature = temperature_options[selected_temperature]
 
