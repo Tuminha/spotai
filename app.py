@@ -32,7 +32,7 @@ with st.form(key='my_form'):
 
 if submit_button:
     temperature = temperature_options[selected_temperature]
-    # Rest of your code...
+    
 
     temperature_options = {
         'Daniel Rodrigo Mode': 0.2,
