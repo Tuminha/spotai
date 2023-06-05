@@ -2,13 +2,13 @@ import os
 import streamlit as st
 from langchain.llms import OpenAI
 from langchain import PromptTemplate
-from langchain.chains import LLMChain, Chain
 from langchain.memory import ConversationBufferMemory
 from langchain.utilities import WikipediaAPIWrapper
 from langchain import load_qa_with_sources_chain
 from dotenv import load_dotenv
 from typing import List
 import asyncio
+from langchain.chains import Chain
 from langchain import LLMStep
 
 # Get the OpenAI API key from Heroku config vars
