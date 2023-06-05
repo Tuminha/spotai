@@ -3,10 +3,12 @@ import os
 import streamlit as st
 from langchain.llms import OpenAI
 from langchain import PromptTemplate
-from langchain.chains import Chain
 from langchain.memory import ConversationBufferMemory
 from langchain.utilities import WikipediaAPIWrapper
 from dotenv import load_dotenv
+from langchain.chains import Chain
+from langchain.llms import OpenAI
+
 
 
 # Load environment variables
