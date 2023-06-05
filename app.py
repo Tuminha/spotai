@@ -34,14 +34,6 @@ if submit_button:
     temperature = temperature_options[selected_temperature]
     
 
-    temperature_options = {
-        'Daniel Rodrigo Mode': 0.2,
-        'Leticia Sala Mode': 0.5,
-        'Robles Mode': 0.9
-    }
-    selected_temperature = st.selectbox('Select the temperature mode', list(temperature_options.keys()))
-    temperature = temperature_options[selected_temperature]
-
     # Initialize the OpenAI API with the API key from Heroku config vars
     llm = OpenAI(api_key=openai_api_key, temperature=temperature)
 
