@@ -86,13 +86,13 @@ if submit_button:
         topic_slide_memory = ConversationBufferMemory(input_key='main_topic', memory_key='chat_history')
         conclusion_memory = ConversationBufferMemory(input_key='main_topic', memory_key='chat_history')
 
-        # Chains
-        title_chain = LLMChain(llm=llm, prompt_template=title_template, memory=title_memory)
-        intro_chain = LLMChain(llm=llm, prompt_template=intro_template, memory=intro_memory)
-        overview_chain = LLMChain(llm=llm, prompt_template=overview_template, memory=overview_memory)
-        topic_slide_chain1 = LLMChain(llm=llm, prompt_template=topic_slide_template1, memory=topic_slide_memory)
-        topic_slide_chain2 = LLMChain(llm=llm, prompt_template=topic_slide_template2, memory=topic_slide_memory)
-        conclusion_chain = LLMChain(llm=llm, prompt_template=conclusion_template, memory=conclusion_memory)
+       # Chains
+        title_chain = LLMChain(llm=llm, prompt=title_template, memory=title_memory)
+        intro_chain = LLMChain(llm=llm, prompt=intro_template, memory=intro_memory)
+        overview_chain = LLMChain(llm=llm, prompt=overview_template, memory=overview_memory)
+        topic_slide_chain1 = LLMChain(llm=llm, prompt=topic_slide_template1, memory=topic_slide_memory)
+        topic_slide_chain2 = LLMChain(llm=llm, prompt=topic_slide_template2, memory=topic_slide_memory)
+        conclusion_chain = LLMChain(llm=llm, prompt=conclusion_template, memory=conclusion_memory)
 
         # Progress bar
         progress_bar = st.progress(0)
