@@ -12,7 +12,7 @@ openai_api_key = os.environ.get('OPENAI_API_KEY')
 
 # Function to update the progress bar and fetch Wikipedia research
 def get_wiki_research(topic, progress):
-    wiki_research = Wikipedia.run(topic)
+    wiki_research = wiki.run(topic)
     progress_bar.progress(progress)
     return wiki_research
 
@@ -93,6 +93,9 @@ if submit_button:
         topic_slide_chain1 = LLMChain(llm=llm, prompt=topic_slide_template1, memory=topic_slide_memory)
         topic_slide_chain2 = LLMChain(llm=llm, prompt=topic_slide_template2, memory=topic_slide_memory)
         conclusion_chain = LLMChain(llm=llm, prompt=conclusion_template, memory=conclusion_memory)
+
+        wiki = WikipediaAPIWrapper()
+
 
         # Progress bar
         progress_bar = st.progress(0)
