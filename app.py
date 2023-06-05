@@ -1,5 +1,5 @@
 import os
-from tkinter.ttk import Progressbar
+from streamlit import progress as st_progress
 from click import progressbar 
 import streamlit as st 
 from langchain.llms import OpenAI
@@ -103,7 +103,8 @@ if submit_button:
         slide_title = f"Advantages of {main_topic} and {subtopic}"
         bullet_points = "• Bullet point 1\n• Bullet point 2\n• Bullet point 3"  # Replace with relevant content based on the query
         topic_slide1 = topic_slide_chain1.run(main_topic=main_topic, subtopic=subtopic, wikipedia_research=main_topic + "\n\n" + subtopic, slide_title=slide_title, bullet_points=bullet_points)
-        Progressbar.progress(0.7)
+        st_progress(0.7)
+
 
         # Generate slide 2
         slide_title = f"Procedures of {main_topic} and {subtopic}"
@@ -117,7 +118,7 @@ if submit_button:
         main_topic_research = get_wiki_research(main_topic, 0.1)
         subtopic_research = get_wiki_research(subtopic, 0.2)
 
-        # Run the chains and update the progress bar
+       # Run the chains and update the progress bar
         progress_bar.progress(0.3)
         title = title_chain.run(main_topic=main_topic, subtopic=subtopic, duration=duration, audience=audience)
         progress_bar.progress(0.4)
@@ -126,11 +127,12 @@ if submit_button:
         overview = overview_chain.run(main_topic=main_topic, subtopic=subtopic)
         progress_bar.progress(0.6)
         topic_slide1 = topic_slide_chain1.run(main_topic=main_topic, subtopic=subtopic, wikipedia_research=main_topic_research + "\n\n" + subtopic_research)
-        progress_bar.progress(0.7)
+        st.progress(0.7)
         topic_slide2 = topic_slide_chain2.run(main_topic=main_topic, subtopic=subtopic, wikipedia_research=main_topic_research + "\n\n" + subtopic_research)
-        progress_bar.progress(0.8)
+        st.progress(0.8)
         conclusion = conclusion_chain.run(main_topic=main_topic, subtopic=subtopic)
         progress_bar.progress(1.0)
+
 
       
 
