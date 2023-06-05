@@ -11,8 +11,6 @@ from dotenv import load_dotenv
 # Get the OpenAI API key from Heroku config vars
 openai_api_key = os.environ.get('OPENAI_API_KEY')
 
-
-
 # App framework
 st.title('🦷 Perio & Implant dentistry Presentation Creator')
 main_topic = st.text_input('Enter the main topic')
@@ -20,7 +18,6 @@ subtopic = st.text_input('Enter the subtopic')
 duration = st.text_input('Enter the duration of the presentation')
 audience = st.text_input('Enter the audience for the presentation')
 submit_button = st.form_submit_button(label='Submit')
-
 
 # Temperature options
 temperature_options = {
@@ -33,6 +30,7 @@ temperature = temperature_options[selected_temperature]
 
 # Initialize the OpenAI API with the API key from Heroku config vars
 llm = OpenAI(api_key=openai_api_key, temperature=temperature)
+
 # Prompt templates
 title_template = PromptTemplate(
     input_variables=['main_topic', 'subtopic', 'duration', 'audience'], 
@@ -61,8 +59,6 @@ topic_slide_memory = ConversationBufferMemory(input_key='main_topic', memory_key
 conclusion_memory = ConversationBufferMemory(input_key='main_topic', memory_key='chat_history')
 
 # GPT model
-temperature = temperature_options[selected_temperature]
-llm = OpenAI(temperature=temperature)
 title_chain = LLMChain(prompt=title_template, llm=llm, memory=title_memory)
 intro_chain = LLMChain(prompt=intro_template, llm=llm, memory=intro_memory)
 topic_slide_chain = LLMChain(prompt=topic_slide_template, llm=llm, memory=topic_slide_memory)
@@ -81,38 +77,60 @@ if main_topic and subtopic and duration and audience:
     wiki_research_main_topic = wiki.run(input_key_main_topic)
     wiki_research_combined = wiki.run(input_key_combined)
 
-    # Generate content for each slide
-    slides = []
+    # Initialize the progress bar
+    progress_bar = st.progress(0)
+# Continue from where it was left off
 
-    # Title slide
-    title_slide = title_chain.run(main_topic=main_topic, subtopic=subtopic, duration=duration, audience=audience)
-    slides.append(("SLIDE 1: **{}**".format(title_slide.upper()), ''))
+progress_bar.text("Fetching data...")
+wiki_research_main_topic = wiki.run(input_key_main_topic)
+progress_bar.progress(25)  # Update the progress bar
 
-    # Introduction slides
-    intro_slide = intro_chain.run(main_topic=main_topic, subtopic=subtopic)
-    slides.append(("SLIDE 2: **INTRODUCTION**", intro_slide))
+wiki_research_combined = wiki.run(input_key_combined)
+progress_bar.progress(50)  # Update the progress bar
 
-    # Topic slides
-    num_topic_slides = duration // 3  # 1 slide per 3 minutes of duration
-    for i in range(num_topic_slides):
-        topic_slide = topic_slide_chain.run(main_topic=main_topic, subtopic=subtopic, wikipedia_research=wiki_research_combined)
-        image_prompt = "Imagine a depiction of {main_topic} and {subtopic}. 4K, Realistic".format(main_topic=main_topic, subtopic=subtopic)
-        slides.append(("SLIDE {}: **{}**".format(i+3, topic_slide.upper()), topic_slide, image_prompt))
+# Generate content for each slide
+slides = []
 
-    # Conclusion slide
-    conclusion_slide = conclusion_chain.run(main_topic=main_topic, subtopic=subtopic)
-    slides.append(("SLIDE {}: **CONCLUSION**".format(num_topic_slides+3), conclusion_slide))
+# Title slide
+progress_bar.text("Generating title slide...")
+title_slide = title_chain.run(main_topic=main_topic, subtopic=subtopic, duration=duration, audience=audience)
+slides.append(("SLIDE 1: **{}**".format(title_slide.upper()), ''))
+progress_bar.progress(60)  # Update the progress bar
 
-    # Display the generated slides
-    for slide in slides:
-        st.markdown(slide[0])  # Slide title in uppercase and bold
-        st.write("• " + slide[1].replace(". ", ".\n• "))  # Bullet points for slide content
-        if len(slide) > 2:
-            st.write("Image Prompt: " + slide[2])  # Image generation prompt
-        st.write("\n*Reference: Placeholder for bibliographic reference*\n")  # Placeholder for bibliographic reference
+# Introduction slides
+progress_bar.text("Generating introduction slide...")
+intro_slide = intro_chain.run(main_topic=main_topic, subtopic=subtopic)
+slides.append(("SLIDE 2: **INTRODUCTION**", intro_slide))
+progress_bar.progress(70)  # Update the progress bar
 
-    with st.expander('Wikipedia Research - Main Topic'): 
-        st.info(wiki_research_main_topic)
+# Topic slides
+num_topic_slides = duration // 3  # 1 slide per 3 minutes of duration
+for i in range(num_topic_slides):
+    progress_bar.text(f"Generating topic slide {i+1}...")
+    topic_slide = topic_slide_chain.run(main_topic=main_topic, subtopic=subtopic, wikipedia_research=wiki_research_combined)
+    image_prompt = "Imagine a depiction of {main_topic} and {subtopic}. 4K, Realistic".format(main_topic=main_topic, subtopic=subtopic)
+    slides.append(("SLIDE {}: **{}**".format(i+3, topic_slide.upper()), topic_slide, image_prompt))
+    progress_bar.progress(70 + i*10/num_topic_slides)  # Update the progress bar
 
-    with st.expander('Wikipedia Research - Combined Topic'): 
-        st.info(wiki_research_combined)
+# Conclusion slide
+progress_bar.text("Generating conclusion slide...")
+conclusion_slide = conclusion_chain.run(main_topic=main_topic, subtopic=subtopic)
+slides.append(("SLIDE {}: **CONCLUSION**".format(num_topic_slides+3), conclusion_slide))
+progress_bar.progress(90)  # Update the progress bar
+
+# Display the generated slides
+for slide in slides:
+    st.markdown(slide[0])  # Slide title in uppercase and bold
+    st.write("• " + slide[1].replace(". ", ".\n• "))  # Bullet points for slide content
+    if len(slide) > 2:
+        st.write("Image Prompt: " + slide[2])  # Image generation prompt
+    st.write("\n*Reference: Placeholder for bibliographic reference*\n")  # Placeholder for bibliographic reference
+
+progress_bar.progress(100)  # Update the progress bar to complete
+progress_bar.text("Completed!")
+
+with st.expander('Wikipedia Research - Main Topic'): 
+    st.info(wiki_research_main_topic)
+
+with st.expander('Wikipedia Research - Combined Topic'): 
+    st.info(wiki_research_combined)
