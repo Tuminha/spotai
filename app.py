@@ -1,7 +1,7 @@
 import os 
 import streamlit as st 
 from langchain.llms import OpenAI
-from langchain import PromptTemplate
+from langchain import PromptTemplate, Wikipedia
 from langchain.chains import LLMChain
 from langchain.memory import ConversationBufferMemory
 from langchain.utilities import WikipediaAPIWrapper 
@@ -12,9 +12,13 @@ openai_api_key = os.environ.get('OPENAI_API_KEY')
 
 # Function to update the progress bar and fetch Wikipedia research
 def get_wiki_research(topic, progress):
-    wiki_research = wiki.run(topic)
+    wiki_research = Wikipedia.run(topic)
     progress_bar.progress(progress)
     return wiki_research
+
+# Function to format slide content into bullet points
+def format_slide_content(content):
+    return "• " + content.replace(". ", ".\n• ")
 
 # App framework
 st.title('🦷 Perio & Implant dentistry Presentation Creator')
@@ -60,9 +64,14 @@ if submit_button:
             template='Provide an overview of the topics to be covered in the presentation on {main_topic} and {subtopic}.'
         )
 
-        topic_slide_template = PromptTemplate(
+        topic_slide_template1 = PromptTemplate(
             input_variables=['main_topic', 'subtopic', 'wikipedia_research'],
-            template='Create a slide about {main_topic} and {subtopic} based on this research: {wikipedia_research}.'
+            template='Create a slide about {main_topic} and {subtopic} focusing on advantage based on this research: {wikipedia_research}.'
+        )
+
+        topic_slide_template2 = PromptTemplate(
+            input_variables=['main_topic', 'subtopic', 'wikipedia_research'],
+            template='Create a slide about {main_topic} and {subtopic} focusing on procedure based on this research: {wikipedia_research}.'
         )
 
         conclusion_template = PromptTemplate(
@@ -77,73 +86,53 @@ if submit_button:
         topic_slide_memory = ConversationBufferMemory(input_key='main_topic', memory_key='chat_history')
         conclusion_memory = ConversationBufferMemory(input_key='main_topic', memory_key='chat_history')
 
-        # GPT model
-        title_chain = LLMChain(prompt=title_template, llm=llm, memory=title_memory)
-        intro_chain = LLMChain(prompt=intro_template, llm=llm, memory=intro_memory)
-        overview_chain = LLMChain(prompt=overview_template, llm=llm, memory=overview_memory)
-        topic_slide_chain = LLMChain(prompt=topic_slide_template, llm=llm, memory=topic_slide_memory)
-        conclusion_chain = LLMChain(prompt=conclusion_template, llm=llm, memory=conclusion_memory)
+        # Chains
+        title_chain = LLMChain(llm=llm, prompt_template=title_template, memory=title_memory)
+        intro_chain = LLMChain(llm=llm, prompt_template=intro_template, memory=intro_memory)
+        overview_chain = LLMChain(llm=llm, prompt_template=overview_template, memory=overview_memory)
+        topic_slide_chain1 = LLMChain(llm=llm, prompt_template=topic_slide_template1, memory=topic_slide_memory)
+        topic_slide_chain2 = LLMChain(llm=llm, prompt_template=topic_slide_template2, memory=topic_slide_memory)
+        conclusion_chain = LLMChain(llm=llm, prompt_template=conclusion_template, memory=conclusion_memory)
 
-        # Wikipedia
-        wiki = WikipediaAPIWrapper()
+        # Progress bar
+        progress_bar = st.progress(0)
 
-        # Show results
-        input_key_main_topic = main_topic
-        input_key_combined = f"{main_topic} {subtopic}"
-        duration = int(duration)  # Convert duration to an integer
+        # Fetch Wikipedia research for each of the topics and update the progress bar
+        main_topic_research = get_wiki_research(main_topic, 0.1)
+        subtopic_research = get_wiki_research(subtopic, 0.2)
 
-        progress_bar = st.progress(0)  # Initialize progress bar
+        # Run the chains and update the progress bar
+        progress_bar.progress(0.3)
+        title = title_chain.run(main_topic=main_topic, subtopic=subtopic, duration=duration, audience=audience)
+        progress_bar.progress(0.4)
+        intro = intro_chain.run(main_topic=main_topic, subtopic=subtopic)
+        progress_bar.progress(0.5)
+        overview = overview_chain.run(main_topic=main_topic, subtopic=subtopic)
+        progress_bar.progress(0.6)
+        topic_slide1 = topic_slide_chain1.run(main_topic=main_topic, subtopic=subtopic, wikipedia_research=main_topic_research + "\n\n" + subtopic_research)
+        progress_bar.progress(0.7)
+        topic_slide2 = topic_slide_chain2.run(main_topic=main_topic, subtopic=subtopic, wikipedia_research=main_topic_research + "\n\n" + subtopic_research)
+        progress_bar.progress(0.8)
+        conclusion = conclusion_chain.run(main_topic=main_topic, subtopic=subtopic)
+        progress_bar.progress(1.0)
 
-        # Perform separate queries to Wikipedia
-        wiki_research_main_topic = get_wiki_research(input_key_main_topic, 25/100)
-        wiki_research_combined = get_wiki_research(input_key_combined, 50/100)
+        # Show the results
+        st.success('Presentation generated successfully!')
 
-        # Generate content for each slide
-        slides = []
+        st.header('Presentation Title')
+        st.write(format_slide_content(title))
 
-        # Title slide
-        title_slide = title_chain.run(main_topic=main_topic, subtopic=subtopic, duration=duration, audience=audience)
-        slides.append(("SLIDE 1: **{}**".format(title_slide.upper()), ''))
-        progress_bar.progress(60/100)  # Update the progress bar
+        st.header('Introduction')
+        st.write(format_slide_content(intro))
 
-        # Introduction slide
-        intro_slide = intro_chain.run(main_topic=main_topic, subtopic=subtopic)
-        slides.append(("SLIDE 2: **INTRODUCTION**", intro_slide))
-        progress_bar.progress(70/100)  # Update the progress bar
+        st.header('Overview')
+        st.write(format_slide_content(overview))
 
-        # Overview slide
-        overview_slide = overview_chain.run(main_topic=main_topic, subtopic=subtopic)
-        slides.append(("SLIDE 3: **OVERVIEW**", overview_slide))
-        progress_bar.progress(75/100)  # Update the progress bar
+        st.header('Main Topic Slide 1')
+        st.write(format_slide_content(topic_slide1))
 
-        # Topic slides
-        num_topic_slides = duration // 3  # 1 slide per 3 minutes of duration
-        for i in range(num_topic_slides):
-            topic_slide = topic_slide_chain.run(main_topic=main_topic, subtopic=subtopic, wikipedia_research=wiki_research_combined)
-            image_prompt = "Imagine a depiction of {main_topic} and {subtopic}. 4K, Realistic".format(main_topic=main_topic, subtopic=subtopic)
-            slides.append(("SLIDE {}: **{}**".format(i+4, topic_slide.upper()), topic_slide, image_prompt))
-            progress_bar.progress((75 + i*10/num_topic_slides) / 100)  # Update the progress bar
+        st.header('Main Topic Slide 2')
+        st.write(format_slide_content(topic_slide2))
 
-        # Conclusion slide
-        conclusion_slide = conclusion_chain.run(main_topic=main_topic, subtopic=subtopic)
-        slides.append(("SLIDE {}: **CONCLUSION**".format(num_topic_slides+4), conclusion_slide))
-        progress_bar.progress(90/100)  # Update the progress bar
-
-
-        # Display the generated slides
-        for slide in slides:
-            st.markdown(slide[0])  # Slide title in uppercase and bold
-            st.write("• " + slide[1].replace(". ", ".\n• "))  # Bullet points for slide content
-            if len(slide) > 2:
-                st.write("Image Prompt: " + slide[2])  # Image prompt proposal
-            st.write("\n*Reference: Placeholder for bibliographic reference*\n")  # Placeholder for bibliographic reference
-            st.write("\n")  # Space between slides
-
-        progress_bar.progress(100/100)  # Complete the progress bar
-
-
-        with st.expander('Wikipedia Research - Main Topic'): 
-            st.info(wiki_research_main_topic)
-
-        with st.expander('Wikipedia Research - Combined Topic'): 
-            st.info(wiki_research_combined)
+        st.header('Conclusion')
+        st.write(format_slide_content(conclusion))
