@@ -19,6 +19,8 @@ main_topic = st.text_input('Enter the main topic')
 subtopic = st.text_input('Enter the subtopic')
 duration = st.text_input('Enter the duration of the presentation')
 audience = st.text_input('Enter the audience for the presentation')
+submit_button = st.form_submit_button(label='Submit')
+
 
 # Temperature options
 temperature_options = {
