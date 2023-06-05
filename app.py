@@ -4,7 +4,6 @@ from langchain.llms import OpenAI
 from langchain import PromptTemplate
 from langchain.memory import ConversationBufferMemory
 from langchain.utilities import WikipediaAPIWrapper
-from langchain import load_qa_with_sources_chain
 from dotenv import load_dotenv
 from typing import List
 import asyncio
