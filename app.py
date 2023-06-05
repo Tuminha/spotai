@@ -18,7 +18,7 @@ def get_wiki_research(topic, progress):
 
 # Function to format slide content into bullet points
 def format_slide_content(content):
-    return "• " + content.replace(". ", ".\n• ")
+    return content.replace(". ", ".\n• ")
 
 # App framework
 st.title('🦷 Perio & Implant dentistry Presentation Creator')
@@ -66,12 +66,12 @@ if submit_button:
 
         topic_slide_template1 = PromptTemplate(
             input_variables=['main_topic', 'subtopic', 'wikipedia_research'],
-            template='Create a slide about {main_topic} and {subtopic} focusing on advantage based on this research: {wikipedia_research}.'
+            template='Create a slide about {main_topic} and {subtopic} focusing on advantages based on this research: {wikipedia_research}.'
         )
 
         topic_slide_template2 = PromptTemplate(
             input_variables=['main_topic', 'subtopic', 'wikipedia_research'],
-            template='Create a slide about {main_topic} and {subtopic} focusing on procedure based on this research: {wikipedia_research}.'
+            template='Create a slide about {main_topic} and {subtopic} focusing on procedures based on this research: {wikipedia_research}.'
         )
 
         conclusion_template = PromptTemplate(
@@ -96,54 +96,49 @@ if submit_button:
 
         wiki = WikipediaAPIWrapper()
 
-        # Generate slide 1
-        slide_title = f"Advantages of {main_topic} and {subtopic}"
-        bullet_points = "• Bullet point 1\n• Bullet point 2\n• Bullet point 3"  # Replace with relevant content based on the query
-        topic_slide1 = topic_slide_chain1.run(main_topic=main_topic, subtopic=subtopic, wikipedia_research=main_topic + "\n\n" + subtopic, slide_title=slide_title, bullet_points=bullet_points)
-        progress_bar = st.progress(0.7)
+        # Generate slide 1: Cover slide
+        st.header('Slide 1: Cover Slide')
+        st.subheader(f'Title: {main_topic}')
+        st.subheader(f'Subtopic: {subtopic}')
 
-        # Generate slide 2
-        slide_title = f"Procedures of {main_topic} and {subtopic}"
-        bullet_points = "• Bullet point 1\n• Bullet point 2\n• Bullet point 3"  # Replace with relevant content based on the query
-        topic_slide2 = topic_slide_chain2.run(main_topic=main_topic, subtopic=subtopic, wikipedia_research=main_topic + "\n\n" + subtopic, slide_title=slide_title, bullet_points=bullet_points)
-        st.progress(0.8)
+        # Generate slide 2: Learning objectives
+        st.header('Slide 2: Learning Objectives')
+        st.subheader('Learning Objectives:')
+        st.markdown("""
+        - Objective 1
+        - Objective 2
+        - Objective 3
+        """)
 
-        # Fetch Wikipedia research for each of the topics and update the progress bar
-        main_topic_research = get_wiki_research(main_topic, 0.1)
-        subtopic_research = get_wiki_research(subtopic, 0.2)
+        # Generate slide 3: Index and key points
+        st.header('Slide 3: Presentation Overview')
+        st.subheader('Index and Key Points:')
+        st.markdown("""
+        - Introduction to {main_topic}
+        - Key Point 1
+        - Key Point 2
+        - Key Point 3
+        """)
 
-        # Run the chains and update the progress bar
-        progress_bar.progress(0.3)
-        title = title_chain.run(main_topic=main_topic, subtopic=subtopic, duration=duration, audience=audience)
-        progress_bar.progress(0.4)
-        intro = intro_chain.run(main_topic=main_topic, subtopic=subtopic)
-        progress_bar.progress(0.5)
-        overview = overview_chain.run(main_topic=main_topic, subtopic=subtopic)
-        progress_bar.progress(0.6)
-        topic_slide1 = topic_slide_chain1.run(main_topic=main_topic, subtopic=subtopic, wikipedia_research=main_topic_research + "\n\n" + subtopic_research)
-        progress_bar.progress(0.7)
-        topic_slide2 = topic_slide_chain2.run(main_topic=main_topic, subtopic=subtopic, wikipedia_research=main_topic_research + "\n\n" + subtopic_research)
-        progress_bar.progress(0.8)
-        conclusion = conclusion_chain.run(main_topic=main_topic, subtopic=subtopic)
-        progress_bar.progress(1.0)
+        # Generate slide 4: Introduction
+        st.header('Slide 4: Introduction')
+        st.subheader(f'Introduction to {main_topic}')
+        intro_slide_content = intro_chain.run(main_topic=main_topic, subtopic=subtopic)
+        st.write(format_slide_content(intro_slide_content))
+
+        # Generate content slides
+        num_slides = int(duration) // 3  # Number of content slides based on duration
+        for slide_number in range(5, 5 + num_slides):
+            st.header(f'Slide {slide_number}: Slide Title')
+            st.subheader('Slide Title')
+            slide_content = f"This is the content for Slide {slide_number}"
+            st.write(format_slide_content(slide_content))
+
+        # Generate conclusion slide
+        st.header(f'Slide {num_slides + 5}: Conclusion')
+        st.subheader('Conclusion')
+        conclusion_slide_content = conclusion_chain.run(main_topic=main_topic, subtopic=subtopic)
+        st.write(format_slide_content(conclusion_slide_content))
 
         # Show the results
         st.success('Presentation generated successfully!')
-
-        st.header('Presentation Title')
-        st.write(format_slide_content(title))
-
-        st.header('Introduction')
-        st.write(format_slide_content(intro))
-
-        st.header('Overview')
-        st.write(format_slide_content(overview))
-
-        st.header('Main Topic Slide 1')
-        st.write(format_slide_content(topic_slide1))
-
-        st.header('Main Topic Slide 2')
-        st.write(format_slide_content(topic_slide2))
-
-        st.header('Conclusion')
-        st.write(format_slide_content(conclusion))
