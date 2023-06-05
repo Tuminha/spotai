@@ -27,11 +27,11 @@ with st.form(key='my_form'):
 
     # Temperature options
     temperature_options = {
-        'Daniel Rodrigo Mode': 0.2,
-        'Leticia Sala Mode': 0.5,
-        'Robles Mode': 0.9
+        0: {'label': 'Daniel Rodrigo Mode', 'value': 0.2},
+        1: {'label': 'Leticia Sala Mode', 'value': 0.5},
+        2: {'label': 'Robles Mode', 'value': 0.9}
     }
-    selected_temperature = st.selectbox('Select the temperature mode', list(temperature_options.keys()))
+    selected_temperature = st.slider('Select the temperature mode', min_value=0, max_value=2, format="%d")
     
     submit_button = st.form_submit_button(label='Submit')
 
@@ -41,7 +41,7 @@ if submit_button:
     if not main_topic or not subtopic or not duration.isdigit() or not audience:
         st.error("Please fill in all the fields correctly.")
     else:
-        temperature = temperature_options[selected_temperature]
+        temperature = temperature_options[selected_temperature]['value']
 
         # Initialize the OpenAI API with the API key from Heroku config vars
         llm = OpenAI(api_key=openai_api_key, temperature=temperature)
@@ -150,3 +150,19 @@ if submit_button:
 
     with st.expander('Wikipedia Research - Combined Topic'): 
         st.info(wiki_research_combined)
+
+        
+
+# Add custom CSS to the page
+st.markdown(
+    """
+    <style>
+    .stSlider { 
+        background-image: linear-gradient(to right, blue, red);
+        /* Add any other desired styling */
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
