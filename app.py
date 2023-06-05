@@ -18,11 +18,22 @@ with st.form(key='my_form'):
     subtopic = st.text_input('Enter the subtopic')
     duration = st.text_input('Enter the duration of the presentation')
     audience = st.text_input('Enter the audience for the presentation')
+
+    # Temperature options
+    temperature_options = {
+        'Daniel Rodrigo Mode': 0.2,
+        'Leticia Sala Mode': 0.5,
+        'Robles Mode': 0.9
+    }
+    selected_temperature = st.selectbox('Select the temperature mode', list(temperature_options.keys()))
+    
     submit_button = st.form_submit_button(label='Submit')
 
 
 if submit_button:
-    # Temperature options
+    temperature = temperature_options[selected_temperature]
+    # Rest of your code...
+
     temperature_options = {
         'Daniel Rodrigo Mode': 0.2,
         'Leticia Sala Mode': 0.5,
@@ -81,13 +92,13 @@ if submit_button:
         wiki_research_combined = wiki.run(input_key_combined)
 
     progress_bar = st.progress(0)  # Initialize progress bar
-    progress_bar.progress(10)  # Update the progress bar
+    progress_bar.progress(10 / 100)  # Update the progress bar
 
     wiki_research_main_topic = wiki.run(input_key_main_topic)
-    progress_bar.progress(25)  # Update the progress bar
+    progress_bar.progress(25/100)  # Update the progress bar
 
     wiki_research_combined = wiki.run(input_key_combined)
-    progress_bar.progress(50)  # Update the progress bar
+    progress_bar.progress(50/100)  # Update the progress bar
 
     # Generate content for each slide
     slides = []
@@ -95,12 +106,12 @@ if submit_button:
     # Title slide
     title_slide = title_chain.run(main_topic=main_topic, subtopic=subtopic, duration=duration, audience=audience)
     slides.append(("SLIDE 1: **{}**".format(title_slide.upper()), ''))
-    progress_bar.progress(60)  # Update the progress bar
+    progress_bar.progress(60/100)  # Update the progress bar
 
     # Introduction slides
     intro_slide = intro_chain.run(main_topic=main_topic, subtopic=subtopic)
     slides.append(("SLIDE 2: **INTRODUCTION**", intro_slide))
-    progress_bar.progress(70)  # Update the progress bar
+    progress_bar.progress(70/100)  # Update the progress bar
 
     # Topic slides
     num_topic_slides = duration // 3  # 1 slide per 3 minutes of duration
@@ -108,12 +119,12 @@ if submit_button:
         topic_slide = topic_slide_chain.run(main_topic=main_topic, subtopic=subtopic, wikipedia_research=wiki_research_combined)
         image_prompt = "Imagine a depiction of {main_topic} and {subtopic}. 4K, Realistic".format(main_topic=main_topic, subtopic=subtopic)
         slides.append(("SLIDE {}: **{}**".format(i+3, topic_slide.upper()), topic_slide, image_prompt))
-        progress_bar.progress(70 + i*10/num_topic_slides)  # Update the progress bar
+        progress_bar.progress((70 + i*10/num_topic_slides) / 100)  # Update the progress bar
 
     # Conclusion slide
     conclusion_slide = conclusion_chain.run(main_topic=main_topic, subtopic=subtopic)
     slides.append(("SLIDE {}: **CONCLUSION**".format(num_topic_slides+3), conclusion_slide))
-    progress_bar.progress(90)  # Update the progress bar
+    progress_bar.progress(90/100)  # Update the progress bar
 
     # Display the generated slides
     for slide in slides:
