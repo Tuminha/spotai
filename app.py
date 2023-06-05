@@ -1,4 +1,6 @@
-import os 
+import os
+from tkinter.ttk import Progressbar
+from click import progressbar 
 import streamlit as st 
 from langchain.llms import OpenAI
 from langchain import PromptTemplate, Wikipedia
@@ -97,6 +99,17 @@ if submit_button:
         wiki = WikipediaAPIWrapper()
 
 
+       # Generate slide 1
+        slide_title = f"Advantages of {main_topic} and {subtopic}"
+        bullet_points = "• Bullet point 1\n• Bullet point 2\n• Bullet point 3"  # Replace with relevant content based on the query
+        topic_slide1 = topic_slide_chain1.run(main_topic=main_topic, subtopic=subtopic, wikipedia_research=main_topic + "\n\n" + subtopic, slide_title=slide_title, bullet_points=bullet_points)
+        Progressbar.progress(0.7)
+
+        # Generate slide 2
+        slide_title = f"Procedures of {main_topic} and {subtopic}"
+        bullet_points = "• Bullet point 1\n• Bullet point 2\n• Bullet point 3"  # Replace with relevant content based on the query
+        topic_slide2 = topic_slide_chain2.run(main_topic=main_topic, subtopic=subtopic, wikipedia_research=main_topic + "\n\n" + subtopic, slide_title=slide_title, bullet_points=bullet_points)
+        progressbar.progress(0.8)
         # Progress bar
         progress_bar = st.progress(0)
 
@@ -118,6 +131,8 @@ if submit_button:
         progress_bar.progress(0.8)
         conclusion = conclusion_chain.run(main_topic=main_topic, subtopic=subtopic)
         progress_bar.progress(1.0)
+
+      
 
         # Show the results
         st.success('Presentation generated successfully!')
