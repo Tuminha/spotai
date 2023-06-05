@@ -81,7 +81,7 @@ if submit_button:
 
 
    # Memory 
-memory = ConversationBufferMemory(input_key='main_topic', memory_key='chat_history')
+    memory = ConversationBufferMemory(input_key='main_topic', memory_key='chat_history')
 
 # GPT model
 llm = OpenAI(temperature=0.5)
