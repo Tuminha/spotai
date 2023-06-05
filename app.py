@@ -77,11 +77,9 @@ if main_topic and subtopic and duration and audience:
     wiki_research_main_topic = wiki.run(input_key_main_topic)
     wiki_research_combined = wiki.run(input_key_combined)
 
-    # Initialize the progress bar
-    progress_bar = st.progress(0)
-# Continue from where it was left off
+progress_bar = st.progress(0)  # Initialize progress bar
+progress_bar.progress(10)  # Update the progress bar
 
-progress_bar.text("Fetching data...")
 wiki_research_main_topic = wiki.run(input_key_main_topic)
 progress_bar.progress(25)  # Update the progress bar
 
@@ -92,13 +90,11 @@ progress_bar.progress(50)  # Update the progress bar
 slides = []
 
 # Title slide
-progress_bar.text("Generating title slide...")
 title_slide = title_chain.run(main_topic=main_topic, subtopic=subtopic, duration=duration, audience=audience)
 slides.append(("SLIDE 1: **{}**".format(title_slide.upper()), ''))
 progress_bar.progress(60)  # Update the progress bar
 
 # Introduction slides
-progress_bar.text("Generating introduction slide...")
 intro_slide = intro_chain.run(main_topic=main_topic, subtopic=subtopic)
 slides.append(("SLIDE 2: **INTRODUCTION**", intro_slide))
 progress_bar.progress(70)  # Update the progress bar
@@ -106,14 +102,12 @@ progress_bar.progress(70)  # Update the progress bar
 # Topic slides
 num_topic_slides = duration // 3  # 1 slide per 3 minutes of duration
 for i in range(num_topic_slides):
-    progress_bar.text(f"Generating topic slide {i+1}...")
     topic_slide = topic_slide_chain.run(main_topic=main_topic, subtopic=subtopic, wikipedia_research=wiki_research_combined)
     image_prompt = "Imagine a depiction of {main_topic} and {subtopic}. 4K, Realistic".format(main_topic=main_topic, subtopic=subtopic)
     slides.append(("SLIDE {}: **{}**".format(i+3, topic_slide.upper()), topic_slide, image_prompt))
     progress_bar.progress(70 + i*10/num_topic_slides)  # Update the progress bar
 
 # Conclusion slide
-progress_bar.text("Generating conclusion slide...")
 conclusion_slide = conclusion_chain.run(main_topic=main_topic, subtopic=subtopic)
 slides.append(("SLIDE {}: **CONCLUSION**".format(num_topic_slides+3), conclusion_slide))
 progress_bar.progress(90)  # Update the progress bar
@@ -127,7 +121,6 @@ for slide in slides:
     st.write("\n*Reference: Placeholder for bibliographic reference*\n")  # Placeholder for bibliographic reference
 
 progress_bar.progress(100)  # Update the progress bar to complete
-progress_bar.text("Completed!")
 
 with st.expander('Wikipedia Research - Main Topic'): 
     st.info(wiki_research_main_topic)
