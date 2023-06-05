@@ -1,11 +1,15 @@
-import os 
-import streamlit as st 
+import os
+import streamlit as st
 from langchain.llms import OpenAI
 from langchain import PromptTemplate
-from langchain.chains import LLMChain
+from langchain.chains import LLMChain, Chain
 from langchain.memory import ConversationBufferMemory
-from langchain.utilities import WikipediaAPIWrapper 
+from langchain.utilities import WikipediaAPIWrapper
+from langchain import load_qa_with_sources_chain
 from dotenv import load_dotenv
+from typing import List
+import asyncio
+from langchain import LLMStep
 
 # Get the OpenAI API key from Heroku config vars
 openai_api_key = os.environ.get('OPENAI_API_KEY')
@@ -15,6 +19,11 @@ def get_wiki_research(topic, progress):
     wiki_research = wiki.run(topic)
     progress_bar.progress(progress)
     return wiki_research
+
+async def get_relevant_documents(query: str) -> List[str]:
+    # Call the Langchain API to get relevant documents
+    # TODO: replace with actual API call
+    return ["Document 1", "Document 2", "Document 3"]
 
 # App framework
 st.title('🦷 Perio & Implant dentistry Presentation Creator')
@@ -70,65 +79,88 @@ if submit_button:
             template='Write a compelling conclusion for a presentation on {main_topic} and {subtopic}.'
         )
 
-    # Memory 
-    memory = ConversationBufferMemory(input_key='main_topic', memory_key='chat_history')
 
-    # GPT model
-    title_chain = LLMChain(prompt=title_template, llm=llm, memory=memory)
-    intro_chain = LLMChain(prompt=intro_template, llm=llm, memory=memory)
-    overview_chain = LLMChain(prompt=overview_template, llm=llm, memory=memory)
-    topic_slide_chain = LLMChain(prompt=topic_slide_template, llm=llm, memory=memory)
-    conclusion_chain = LLMChain(prompt=conclusion_template, llm=llm, memory=memory)
 
-     # Initialize Wikipedia API wrapper
-    wiki = WikipediaAPIWrapper()
+   # Memory 
+memory = ConversationBufferMemory(input_key='main_topic', memory_key='chat_history')
 
-    # Progress bar
-    progress_bar = st.progress(0)
-    progress = 0.1
-    progress_bar.progress(progress)
+# GPT model
+llm = OpenAI(temperature=0.5)
 
-    # Fetch Wikipedia research for each of the topics and update the progress bar
-    main_topic_research = get_wiki_research(main_topic, progress)
-    progress += 0.1
+title_chain = Chain([
+    get_relevant_documents,
+    LLMStep(llm, prompt=title_template)
+], memory=memory)
 
-    subtopic_research = get_wiki_research(subtopic, progress)
-    progress += 0.1
+intro_chain = Chain([
+    get_relevant_documents,
+    LLMStep(llm, prompt=intro_template)
+], memory=memory)
 
-    # Run the chains and update the progress bar
-    title = title_chain.run(main_topic=main_topic, subtopic=subtopic, duration=duration, audience=audience)
-    progress += 0.1
-    progress_bar.progress(progress)
+overview_chain = Chain([
+    get_relevant_documents,
+    LLMStep(llm, prompt=overview_template)
+], memory=memory)
 
-    intro = intro_chain.run(main_topic=main_topic, subtopic=subtopic)
-    progress += 0.1
-    progress_bar.progress(progress)
+topic_slide_chain = Chain([
+    get_relevant_documents,
+    LLMStep(llm, prompt=topic_slide_template)
+], memory=memory)
 
-    overview = overview_chain.run(main_topic=main_topic, subtopic=subtopic)
-    progress += 0.1
-    progress_bar.progress(progress)
+conclusion_chain = Chain([
+    get_relevant_documents,
+    LLMStep(llm, prompt=conclusion_template)
+], memory=memory)
 
-    topic_slide = topic_slide_chain.run(main_topic=main_topic, subtopic=subtopic, wikipedia_research=main_topic_research + "\n\n" + subtopic_research)
-    progress += 0.1
-    progress_bar.progress(progress)
+# Initialize Wikipedia API wrapper
+wiki = WikipediaAPIWrapper()
 
-    conclusion = conclusion_chain.run(main_topic=main_topic, subtopic=subtopic)
-    progress += 0.1
-    progress_bar.progress(progress)
+# Progress bar
+progress_bar = st.progress(0)
+progress = 0.1
+progress_bar.progress(progress)
 
-    # Show the results
-    st.success('Presentation generated successfully!')
-    st.header('Presentation Title')
-    st.write(title)
+# Fetch Wikipedia research for each of the topics and update the progress bar
+main_topic_research = get_wiki_research(main_topic, progress)
+progress += 0.1
 
-    st.header('Introduction')
-    st.write(intro)
+subtopic_research = get_wiki_research(subtopic, progress)
+progress += 0.1
 
-    st.header('Overview')
-    st.write(overview)
+# Run the chains and update the progress bar
+title = title_chain.run(main_topic=main_topic, subtopic=subtopic, duration=duration, audience=audience)
+progress += 0.1
+progress_bar.progress(progress)
 
-    st.header('Main Topic Slide')
-    st.write(topic_slide)
+intro = intro_chain.run(main_topic=main_topic, subtopic=subtopic)
+progress += 0.1
+progress_bar.progress(progress)
 
-    st.header('Conclusion')
-    st.write(conclusion)
+overview = overview_chain.run(main_topic=main_topic, subtopic=subtopic)
+progress += 0.1
+progress_bar.progress(progress)
+
+topic_slide = topic_slide_chain.run(main_topic=main_topic, subtopic=subtopic, wikipedia_research=main_topic_research + "\n\n" + subtopic_research)
+progress += 0.1
+progress_bar.progress(progress)
+
+conclusion = conclusion_chain.run(main_topic=main_topic, subtopic=subtopic)
+progress += 0.1
+progress_bar.progress(progress)
+
+# Show the results
+st.success('Presentation generated successfully!')
+st.header('Presentation Title')
+st.write(title)
+
+st.header('Introduction')
+st.write(intro)
+
+st.header('Overview')
+st.write(overview)
+
+st.header('Main Topic Slide')
+st.write(topic_slide)
+
+st.header('Conclusion')
+st.write(conclusion)
