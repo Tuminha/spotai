@@ -64,14 +64,9 @@ if submit_button:
             template='Provide an overview of the topics to be covered in the presentation on {main_topic} and {subtopic}.'
         )
 
-        topic_slide_template1 = PromptTemplate(
+        topic_slide_template = PromptTemplate(
             input_variables=['main_topic', 'subtopic', 'wikipedia_research'],
-            template='Create a slide about {main_topic} and {subtopic} focusing on advantages based on this research: {wikipedia_research}.'
-        )
-
-        topic_slide_template2 = PromptTemplate(
-            input_variables=['main_topic', 'subtopic', 'wikipedia_research'],
-            template='Create a slide about {main_topic} and {subtopic} focusing on procedures based on this research: {wikipedia_research}.'
+            template='Create a slide about {main_topic} and {subtopic} based on this research: {wikipedia_research}.'
         )
 
         conclusion_template = PromptTemplate(
@@ -90,8 +85,7 @@ if submit_button:
         title_chain = LLMChain(llm=llm, prompt=title_template, memory=title_memory)
         intro_chain = LLMChain(llm=llm, prompt=intro_template, memory=intro_memory)
         overview_chain = LLMChain(llm=llm, prompt=overview_template, memory=overview_memory)
-        topic_slide_chain1 = LLMChain(llm=llm, prompt=topic_slide_template1, memory=topic_slide_memory)
-        topic_slide_chain2 = LLMChain(llm=llm, prompt=topic_slide_template2, memory=topic_slide_memory)
+        topic_slide_chain = LLMChain(llm=llm, prompt=topic_slide_template, memory=topic_slide_memory)
         conclusion_chain = LLMChain(llm=llm, prompt=conclusion_template, memory=conclusion_memory)
 
         wiki = WikipediaAPIWrapper()
@@ -110,7 +104,7 @@ if submit_button:
         - Objective 3
         """)
 
-        # Generate slide 3: Index and key points
+        # Generate slide 3: Presentation Overview
         st.header('Slide 3: Presentation Overview')
         st.subheader('Index and Key Points:')
         st.markdown("""
@@ -127,11 +121,11 @@ if submit_button:
         st.write(format_slide_content(intro_slide_content))
 
         # Generate content slides
-        num_slides = int(duration) // 3  # Number of content slides based on duration
+        num_slides = (int(duration) - 4) // 3  # Number of content slides based on duration
         for slide_number in range(5, 5 + num_slides):
             st.header(f'Slide {slide_number}: Slide Title')
             st.subheader('Slide Title')
-            slide_content = f"This is the content for Slide {slide_number}"
+            slide_content = topic_slide_chain.run(main_topic=main_topic, subtopic=subtopic, wikipedia_research="Research for Slide " + str(slide_number))
             st.write(format_slide_content(slide_content))
 
         # Generate conclusion slide
