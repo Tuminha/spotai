@@ -145,13 +145,15 @@ if submit_button:
     slides.append(("SLIDE 3: **OVERVIEW**", overview_slide))
     progress_bar.progress(75/100)  # Update the progress bar
 
-        # Topic slides
-    num_topic_slides = duration // 3  # 1 slide per 3 minutes of duration
+    # Topic slides
+    num_topic_slides = (duration - 3) // 3  # Calculate the number of topic slides, excluding the title, introduction, and overview slides
 
     # CHANGE: Include the content of the previous slide when running the chain
-    previous_slide_content = ""
+    previous_slide_content = overview_slide  # Set the previous slide content to the content of the overview slide
     for i in range(num_topic_slides):
         topic_slide = topic_slide_chain.run(main_topic=main_topic, subtopic=subtopic, wikipedia_research=wiki_research_combined, previous_slide_content=previous_slide_content)
+        slides.append(("SLIDE {}: **{}**".format(i+4, topic_slide.upper()), topic_slide))
+        progress_bar.progress((75 + (i+1)*10/num_topic_slides) / 100)  # Update the progress bar
         previous_slide_content = topic_slide  # update previous_slide_content
 
     # Conclusion slide
@@ -163,17 +165,14 @@ if submit_button:
     for slide in slides:
         slide_title = slide[0]
         slide_content = slide[1]
-        slide_image_prompt = slide[2] if len(slide) > 2 else None
         slide_content_formatted = "• " + slide_content.replace(". ", ".\n• ")  # Bullet points for slide content
 
         st.markdown(slide_title)
         st.markdown(slide_content_formatted)
-        if slide_image_prompt:
-            st.markdown(f"**Image Prompt:** {slide_image_prompt}")
-        st.markdown("\n_Reference: Placeholder for bibliographic reference_\n")
         st.markdown("---")
 
     progress_bar.progress(100/100)  # Complete the progress bar
+
 
     with st.expander('Wikipedia Research - Main Topic'): 
         st.info(wiki_research_main_topic)
