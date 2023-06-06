@@ -26,7 +26,6 @@ def format_output(output):
     formatted_output = formatted_output.replace("\n\n", "\n")
     return formatted_output
 
-formatted_output = format_output(OutputChecker)
 st.write(formatted_output)
 
 
