@@ -9,7 +9,6 @@ from langchain.memory import ConversationBufferMemory
 from langchain.utilities import WikipediaAPIWrapper 
 from dotenv import load_dotenv
 
-from backup.app6 import format_slide_content
 
 # Get the OpenAI API key from Heroku config vars
 openai_api_key = os.environ.get('OPENAI_API_KEY')
@@ -139,6 +138,10 @@ if submit_button:
         - Key Point 2
         - Key Point 3
         """)
+
+        def format_slide_content(content):
+            return content.replace(". ", ".\n• ")
+
 
         # Generate slide 4: Introduction
         st.header('Slide 4: Introduction')
