@@ -5,6 +5,7 @@ anyio==3.6.2
 async-timeout==4.0.2
 attrs==23.1.0
 backoff==2.2.1
+backup==0.0.1
 beautifulsoup4==4.12.2
 blinker==1.6.2
 cachetools==5.3.1
