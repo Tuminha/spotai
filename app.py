@@ -146,7 +146,7 @@ if submit_button:
     # CHANGE: Include the content of the previous slide when running the chain
     previous_slide_content = ""
     for i in range(num_topic_slides):
-        topic_slide = topic_slide_chain.run(main_topic=main_topic + " " + previous_slide_content, subtopic=subtopic + " " + previous_slide_content, wikipedia_research=wiki_research_combined)
+        topic_slide = topic_slide_chain.run(main_topic=main_topic, subtopic=subtopic, wikipedia_research=wiki_research_combined, previous_slide_content=previous_slide_content)
         previous_slide_content = topic_slide  # update previous_slide_content
 
     # Conclusion slide
