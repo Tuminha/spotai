@@ -40,7 +40,7 @@ if submit_button:
     llm = OpenAI(api_key=openai_api_key, temperature=temperature)
 
      # Searx
-    searx = SearxSearchWrapper(searx_host="https://search.inetol.net/")
+    searx = SearxSearchWrapper(searx_host="https://searxng.nicfab.eu/")
 
     # Prompt templates
     title_template = PromptTemplate(
@@ -85,7 +85,7 @@ if submit_button:
     input_key_main_topic = main_topic
     input_key_combined = f"{main_topic} {subtopic}"
     duration = int(duration)  # Convert duration to an integer
-    
+
 
 
     # Query Searx
