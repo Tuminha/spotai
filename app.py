@@ -7,8 +7,6 @@ from langchain.chains import LLMChain
 from langchain.memory import ConversationBufferMemory
 from langchain.utilities import WikipediaAPIWrapper 
 from dotenv import load_dotenv
-from langchain.utilities import SearxSearchWrapper
-
 
 # Get the OpenAI API key from Heroku config vars
 openai_api_key = os.environ.get('OPENAI_API_KEY')
@@ -39,9 +37,6 @@ if submit_button:
     # Initialize the OpenAI API with the API key from Heroku config vars
     llm = OpenAI(api_key=openai_api_key, temperature=temperature)
 
-     # Searx
-    searx = SearxSearchWrapper(searx_host="https://searxng.nicfab.eu/")
-
     # Prompt templates
     title_template = PromptTemplate(
         input_variables=['main_topic', 'subtopic', 'duration', 'audience'], 
@@ -53,12 +48,9 @@ if submit_button:
         template='Write an engaging introduction about {main_topic} and provide some details about the {subtopic}.'
     )
 
-    # Retrieve additional research from Searx
-    searx_research = searx.run(f"{main_topic} {subtopic}", num_results=3)
-
     topic_slide_template = PromptTemplate(
-        input_variables=['main_topic', 'subtopic', 'wikipedia_research', 'searx_research'],
-        template='Create a slide about {main_topic} and {subtopic} based on this research: {wikipedia_research} and {searx_research}.'
+        input_variables=['main_topic', 'subtopic', 'wikipedia_research'],
+        template='Create a slide about {main_topic} and {subtopic} based on this research: {wikipedia_research}.'
     )
 
     conclusion_template = PromptTemplate(
@@ -81,19 +73,6 @@ if submit_button:
     # Wikipedia
     wiki = WikipediaAPIWrapper()
 
-    # Generate the presentation
-    input_key_main_topic = main_topic
-    input_key_combined = f"{main_topic} {subtopic}"
-    duration = int(duration)  # Convert duration to an integer
-
-
-
-    # Query Searx
-
-    searx_research_main_topic = searx.run(input_key_main_topic, engines=["google", "bing"])
-    searx_research_combined = searx.run(input_key_combined, engines=["google", "bing"])
-
-
     # Show results
     if main_topic and subtopic and duration and audience: 
         input_key_main_topic = main_topic
@@ -104,10 +83,6 @@ if submit_button:
         wiki_research_main_topic = wiki.run(input_key_main_topic)
         wiki_research_combined = wiki.run(input_key_combined)
 
-        # Perform separate queries to Searx
-        searx_research_main_topic = searx.run(input_key_main_topic, engines=["google", "bing"])
-        searx_research_combined = searx.run(input_key_combined, engines=["google", "bing"])
-    
     progress_bar = st.progress(0)  # Initialize progress bar
     progress_bar.progress(10 / 100)  # Update the progress bar
 
@@ -158,9 +133,3 @@ if submit_button:
 
     with st.expander('Wikipedia Research - Combined Topic'): 
         st.info(wiki_research_combined)
-
-    with st.expander('Searx Research - Main Topic'): 
-        st.info(searx_research_main_topic)
-
-    with st.expander('Searx Research - Combined Topic'): 
-        st.info(searx_research_combined)
