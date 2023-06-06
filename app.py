@@ -68,28 +68,32 @@ if submit_button:
 
         title_template = PromptTemplate(
             input_variables=['main_topic'],
-            template='{main_topic}: A Comprehensive Presentation'
+            template='Create an attention-grabbing title for a presentation on {main_topic} that captures the audience\'s interest and clearly conveys the main message.'
         )
+
 
         intro_template = PromptTemplate(
             input_variables=['main_topic', 'subtopic'],
-            template='Welcome to this presentation on {main_topic} and {subtopic}. In the next few minutes, we will delve into the importance of these topics, their relevance in the field, and recent advancements.'
+            template='Engage the audience by sharing a captivating story or presenting a thought-provoking question related to {main_topic} and {subtopic}. Then, introduce the importance of these topics, their relevance in the field, and recent advancements.'
         )
 
         overview_template = PromptTemplate(
             input_variables=['main_topic', 'subtopic'],
-            template='Create a detailed roadmap for this presentation on {main_topic} and {subtopic}. Include a bullet-point list of key topics that will be addressed.'
+            template='Create a detailed roadmap for this presentation on {main_topic} and {subtopic}. Highlight key subtopics to be covered, their significance, and provide tips on how to structure the presentation effectively, such as using visual aids or storytelling techniques.'
         )
+
 
         topic_slide_template = PromptTemplate(
             input_variables=['main_topic', 'subtopic', 'wikipedia_research', 'previous_slide_content'],
-            template='Continuing from the previous slide which discussed {previous_slide_content}, create a structured slide on {main_topic} and {subtopic} drawing from this research: {wikipedia_research}. The slide should contain a clear header, 3-5 bullet points, and a brief summary.'
+            template='Continuing from the previous slide which discussed {previous_slide_content}, create a structured slide on {main_topic} and {subtopic} drawing from this research: {wikipedia_research}. The slide should contain a clear header, 3-5 bullet points, a brief summary, and incorporate best practices from Nancy Duarte\'s presentations. Alternatively, create controversy by presenting contrasting viewpoints on the topic.'
         )
+
 
         conclusion_template = PromptTemplate(
             input_variables=['main_topic', 'subtopic'],
-            template='Conclude this presentation on {main_topic} and {subtopic}. Summarize the main points discussed, provide a take-home message, and thank the audience for their attention.'
+            template='Conclude this presentation on {main_topic} and {subtopic} with a memorable closing statement or call-to-action that inspires the audience to take action or further explore the presented topics. Summarize the main points discussed and thank the audience for their attention.'
         )
+
 
 
 
