@@ -87,7 +87,7 @@ if submit_button:
         title_memory = ConversationBufferMemory(input_key='main_topic', memory_key='chat_history')
         intro_memory = ConversationBufferMemory(input_key='main_topic', memory_key='chat_history')
         overview_memory = ConversationBufferMemory(input_key='main_topic', memory_key='chat_history')
-        topic_slide_memory = ConversationBufferMemory(input_key=['main_topic', 'subtopic', 'wikipedia_research'], memory_key='chat_history')
+        topic_slide_memory = ConversationBufferMemory(input_key='main_topic_subtopic_wikipedia_research', memory_key='chat_history')
         conclusion_memory = ConversationBufferMemory(input_key='main_topic', memory_key='chat_history')
 
         # Chains
