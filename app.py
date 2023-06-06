@@ -1,7 +1,7 @@
 import os 
 
 import streamlit as st 
-from langchain.llms import OpenAI
+from langchain.chat_models import ChatOpenAI
 from langchain import PromptTemplate
 from langchain.chains import LLMChain
 from langchain.memory import ConversationBufferMemory
@@ -61,35 +61,36 @@ if submit_button:
         temperature = temperature_options[selected_temperature]
 
         # Initialize the OpenAI API with the API key from Heroku config vars
-        llm = OpenAI(api_key=openai_api_key, temperature=temperature)
+        llm = ChatOpenAI(api_key=openai_api_key, temperature=temperature, model_name="gpt-3.5-turbo")
 
         # Prompt templates
         # CHANGE: Varying the prompt templates to provide more context and guidance
 
         title_template = PromptTemplate(
-            input_variables=['main_topic', 'subtopic', 'duration', 'audience'], 
-            template='Compose a presentation title that encompasses {main_topic} and elaborates on the {subtopic} for a presentation lasting {duration} minutes, targeted at {audience}.'
+            input_variables=['main_topic'],
+            template='{main_topic}: A Comprehensive Presentation'
         )
 
         intro_template = PromptTemplate(
             input_variables=['main_topic', 'subtopic'],
-            template='Craft an engaging introduction that familiarizes the audience with the topic of {main_topic} and elucidates the significance of the {subtopic} in this context.'
+            template='Welcome to this presentation on {main_topic} and {subtopic}. In the next few minutes, we will delve into the importance of these topics, their relevance in the field, and recent advancements.'
         )
 
         overview_template = PromptTemplate(
             input_variables=['main_topic', 'subtopic'],
-            template='Outline the key subjects to be addressed in the presentation on {main_topic} and {subtopic}, providing a roadmap for the audience.'
+            template='Create a detailed roadmap for this presentation on {main_topic} and {subtopic}. Include a bullet-point list of key topics that will be addressed.'
         )
 
         topic_slide_template = PromptTemplate(
             input_variables=['main_topic', 'subtopic', 'wikipedia_research', 'previous_slide_content'],
-            template='Generate a slide focused on {main_topic} and {subtopic} drawing from this research: {wikipedia_research}. The slide should seamlessly follow the content of the previous slide: {previous_slide_content}'
+            template='Continuing from the previous slide which discussed {previous_slide_content}, create a structured slide on {main_topic} and {subtopic} drawing from this research: {wikipedia_research}. The slide should contain a clear header, 3-5 bullet points, and a brief summary.'
         )
 
         conclusion_template = PromptTemplate(
             input_variables=['main_topic', 'subtopic'],
-            template='Compose a compelling conclusion that encapsulates the key points discussed about {main_topic} and {subtopic}, and leaves the audience with a clear take-home message.'
+            template='Conclude this presentation on {main_topic} and {subtopic}. Summarize the main points discussed, provide a take-home message, and thank the audience for their attention.'
         )
+
 
 
 
