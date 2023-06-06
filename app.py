@@ -93,14 +93,12 @@ if submit_button:
 
 
 
-    # CHANGE: Use the new memory class for the chains
-    title_memory = ExtendedConversationBufferMemory(input_key='main_topic', memory_key='chat_history', slide_content_key='previous_slide_content')
-    intro_memory = ExtendedConversationBufferMemory(input_key='main_topic', memory_key='chat_history', slide_content_key='previous_slide_content')
-    overview_memory = ExtendedConversationBufferMemory(input_key='main_topic', memory_key='chat_history', slide_content_key='previous_slide_content')
-    topic_slide_memory = ExtendedConversationBufferMemory(input_key='main_topic', memory_key='chat_history', slide_content_key='previous_slide_content')
-    conclusion_memory = ExtendedConversationBufferMemory(input_key='main_topic', memory_key='chat_history', slide_content_key='previous_slide_content')
-
-    
+    # The original memory class for the chains
+    title_memory = ConversationBufferMemory(input_key='main_topic', memory_key='chat_history')
+    intro_memory = ConversationBufferMemory(input_key='main_topic', memory_key='chat_history')
+    overview_memory = ConversationBufferMemory(input_key='main_topic', memory_key='chat_history')
+    topic_slide_memory = ConversationBufferMemory(input_key='main_topic', memory_key='chat_history')
+    conclusion_memory = ConversationBufferMemory(input_key='main_topic', memory_key='chat_history')
 
 
     # GPT model
@@ -148,10 +146,7 @@ if submit_button:
     # CHANGE: Include the content of the previous slide when running the chain
     previous_slide_content = ""
     for i in range(num_topic_slides):
-        topic_slide = topic_slide_chain.run(main_topic=main_topic, subtopic=subtopic, wikipedia_research=wiki_research_combined, previous_slide_content=previous_slide_content)
-        image_prompt = "Imagine a depiction of {main_topic} and {subtopic}. 4K, Realistic".format(main_topic=main_topic, subtopic=subtopic)
-        slides.append(("SLIDE {}: **{}**".format(i+4, topic_slide.upper()), topic_slide, image_prompt))
-        progress_bar.progress((75 + i*10/num_topic_slides) / 100)  # Update the progress bar
+        topic_slide = topic_slide_chain.run(main_topic=main_topic + " " + previous_slide_content, subtopic=subtopic + " " + previous_slide_content, wikipedia_research=wiki_research_combined)
         previous_slide_content = topic_slide  # update previous_slide_content
 
     # Conclusion slide
