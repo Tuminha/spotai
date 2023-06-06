@@ -51,6 +51,19 @@ with st.form(key='my_form'):
             if self.slide_content_key in self.memory:
                 memory[self.slide_content_key] = self.memory[self.slide_content_key]
             return memory
+        
+# Function to update slide display in real-time
+def update_slide_display(slides):
+    st.markdown("---")  # Separator line
+    st.markdown("**Presentation Slides**")
+    for slide in slides:
+        slide_title = slide[0]
+        slide_content = slide[1]
+        slide_content_formatted = "• " + slide_content.replace(". ", ".\n• ")  # Bullet points for slide content
+
+        st.markdown(slide_title)
+        st.markdown(slide_content_formatted)
+        st.markdown("---")
 
 
 if submit_button:
@@ -127,51 +140,73 @@ if submit_button:
     wiki_research_main_topic = get_wiki_research(input_key_main_topic, 25/100)
     wiki_research_combined = get_wiki_research(input_key_combined, 50/100)
 
-    # Generate content for each slide
+   # Generate content for each slide
     slides = []
 
+    
+
     # Title slide
-    title_slide = title_chain.run(main_topic=main_topic, subtopic=subtopic, duration=duration, audience=audience)
-    slides.append(("SLIDE 1: **{}**".format(title_slide.upper()), ''))
-    progress_bar.progress(60/100)  # Update the progress bar
+    for result in title_chain.run(main_topic=main_topic, subtopic=subtopic, duration=duration, audience=audience):
+        title_slide = result
+        slides.append(("SLIDE 1: **{}**".format(title_slide.upper()), ''))
+        progress_bar.progress(60/100)  # Update the progress bar
+        update_slide_display(slides)  # Function to update slide display in real-time
 
     # Introduction slide
-    intro_slide = intro_chain.run(main_topic=main_topic, subtopic=subtopic)
-    slides.append(("SLIDE 2: **INTRODUCTION**", intro_slide))
-    progress_bar.progress(70/100)  # Update the progress bar
+    for result in intro_chain.run(main_topic=main_topic, subtopic=subtopic):
+        intro_slide = result
+        slides.append(("SLIDE 2: **INTRODUCTION**", intro_slide))
+        progress_bar.progress(70/100)  # Update the progress bar
+        update_slide_display(slides)  # Function to update slide display in real-time
+    
 
     # Overview slide
-    overview_slide = overview_chain.run(main_topic=main_topic, subtopic=subtopic)
-    slides.append(("SLIDE 3: **OVERVIEW**", overview_slide))
-    progress_bar.progress(75/100)  # Update the progress bar
+    for result in overview_chain.run(main_topic=main_topic, subtopic=subtopic):
+        overview_slide = result
+        slides.append(("SLIDE 3: **OVERVIEW**", overview_slide))
+        progress_bar.progress(80/100)  # Update the progress bar
+        update_slide_display(slides)  # Function to update slide display in real-time
+
+
+
 
     # Topic slides
     num_topic_slides = (duration - 3) // 3  # Calculate the number of topic slides, excluding the title, introduction, and overview slides
-
-    # CHANGE: Include the content of the previous slide when running the chain
     previous_slide_content = overview_slide  # Set the previous slide content to the content of the overview slide
+
     for i in range(num_topic_slides):
-        topic_slide = topic_slide_chain.run(main_topic=main_topic, subtopic=subtopic, wikipedia_research=wiki_research_combined, previous_slide_content=previous_slide_content)
-        slides.append(("SLIDE {}: **{}**".format(i+4, topic_slide.upper()), topic_slide))
-        progress_bar.progress((75 + (i+1)*10/num_topic_slides) / 100)  # Update the progress bar
-        previous_slide_content = topic_slide  # update previous_slide_content
-
+        for result in topic_slide_chain.run(main_topic=main_topic, subtopic=subtopic, wikipedia_research=wiki_research_combined, previous_slide_content=previous_slide_content):
+            topic_slide = result
+            slides.append(("SLIDE {}: **{}**".format(i+4, topic_slide.upper()), topic_slide))
+            progress_bar.progress((75 + (i+1)*10/num_topic_slides) / 100)  # Update the progress bar
+            update_slide_display(slides)  # Function to update slide display in real-time
+            previous_slide_content = topic_slide  # update previous_slide_content
     # Conclusion slide
-    conclusion_slide = conclusion_chain.run(main_topic=main_topic, subtopic=subtopic)
-    slides.append(("SLIDE {}: **CONCLUSION**".format(num_topic_slides+4), conclusion_slide))
-    progress_bar.progress(90/100)  # Update the progress bar
+    for result in conclusion_chain.run(main_topic=main_topic, subtopic=subtopic):
+        conclusion_slide = result
+        slides.append(("SLIDE {}: **CONCLUSION**".format(num_topic_slides+4), conclusion_slide))
+        progress_bar.progress(90/100)  # Update the progress bar
+        update_slide_display(slides)  # Function to update slide display in real-time
 
-    # Display the generated slides
-    for slide in slides:
-        slide_title = slide[0]
-        slide_content = slide[1]
-        slide_content_formatted = "• " + slide_content.replace(". ", ".\n• ")  # Bullet points for slide content
 
-        st.markdown(slide_title)
-        st.markdown(slide_content_formatted)
-        st.markdown("---")
+    # Function to update slide display in real-time
+    def update_slide_display(slides):
+        st.markdown("---")  # Separator line
+        st.markdown("**Presentation Slides**")
+        for slide in slides:
+            slide_title = slide[0]
+            slide_content = slide[1]
+            slide_content_formatted = "• " + slide_content.replace(". ", ".\n• ")  # Bullet points for slide content
+
+            st.markdown(slide_title)
+            st.markdown(slide_content_formatted)
+            st.markdown("---")
+
+
 
     progress_bar.progress(100/100)  # Complete the progress bar
+    update_slide_display(slides)  # Function to update slide display
+
 
 
     with st.expander('Wikipedia Research - Main Topic'): 
