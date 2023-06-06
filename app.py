@@ -1,3 +1,4 @@
+from doctest import OutputChecker
 import os
 from click import progressbar
 import streamlit as st
@@ -8,6 +9,8 @@ from langchain.memory import ConversationBufferMemory
 from langchain.utilities import WikipediaAPIWrapper 
 from dotenv import load_dotenv
 
+from backup.app6 import format_slide_content
+
 # Get the OpenAI API key from Heroku config vars
 openai_api_key = os.environ.get('OPENAI_API_KEY')
 
@@ -17,9 +20,17 @@ def get_wiki_research(topic, progress):
     progressbar.progress(progress)
     return wiki_research
 
+
 # Function to format slide content into bullet points
-def format_slide_content(content):
-    return content.replace(". ", ".\n• ")
+def format_output(output):
+    formatted_output = output.replace(". ", ":\n- ")
+    formatted_output = formatted_output.replace("\n\n", "\n")
+    return formatted_output
+
+formatted_output = format_output(OutputChecker)
+st.write(formatted_output)
+
+
 
 # App framework
 st.title('🦷 Perio & Implant dentistry Presentation Creator')
@@ -67,8 +78,9 @@ if submit_button:
 
         topic_slide_template = PromptTemplate(
             input_variables=['main_topic', 'subtopic', 'wikipedia_research'],
-            template='Create a slide about {main_topic} and {subtopic} based on this research: {wikipedia_research}.'
+            template='Create a slide about {main_topic} and {subtopic} based on this research: {wikipedia_research}. The slide should have: 1. A clear title 2. Three key points 3. An optional diagram or image related to the content.'
         )
+
 
         conclusion_template = PromptTemplate(
             input_variables=['main_topic', 'subtopic'],
@@ -79,7 +91,7 @@ if submit_button:
         title_memory = ConversationBufferMemory(input_key='main_topic', memory_key='chat_history')
         intro_memory = ConversationBufferMemory(input_key='main_topic', memory_key='chat_history')
         overview_memory = ConversationBufferMemory(input_key='main_topic', memory_key='chat_history')
-        topic_slide_memory = ConversationBufferMemory(input_key='main_topic', memory_key='chat_history')
+        topic_slide_memory = ConversationBufferMemory(input_key=['main_topic', 'subtopic', 'wikipedia_research'], memory_key='chat_history')
         conclusion_memory = ConversationBufferMemory(input_key='main_topic', memory_key='chat_history')
 
         # Chains
@@ -90,6 +102,19 @@ if submit_button:
         conclusion_chain = LLMChain(llm=llm, prompt=conclusion_template, memory=conclusion_memory)
 
         wiki = WikipediaAPIWrapper()
+
+        col1, col2 = st.beta_columns(2)
+
+        with col1:
+            st.header('Slide Title')
+            st.write('Key Point 1')
+            st.write('Key Point 2')
+            st.write('Key Point 3')
+
+        with col2:
+            st.header('Optional Diagram or Image')
+            st.image('image_url')
+
 
         # Generate slide 1: Cover slide
         st.header('Slide 1: Cover Slide')
@@ -134,6 +159,8 @@ if submit_button:
         st.subheader('Conclusion')
         conclusion_slide_content = conclusion_chain.run(main_topic=main_topic, subtopic=subtopic)
         st.write(format_slide_content(conclusion_slide_content))
+
+        
 
         # Show the results
         st.success('Presentation generated successfully!')
